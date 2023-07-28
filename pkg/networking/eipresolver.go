@@ -23,7 +23,7 @@ func ResolveviaNameorAllocationID(eipsNameOrIDs []string) {
 	}
 	var resolvedEIPs []*ec2sdk.Address
 	if len(allocationIDs) > 0 {
-		eips, err := ec2sdk.DescribeAddressesRequest(&ec2.DescribeAddressesInput{
+		eips, err := ec2sdk.DescribeAddressesWithContext(&ec2.DescribeAddressesInput{
 			AllocationIds: awssdk.StringSlice(allocationIDs),
 		})
 		if err != nil {
@@ -35,7 +35,7 @@ func ResolveviaNameorAllocationID(eipsNameOrIDs []string) {
 	var availableEIPs []string
 	var unavailableEIPs []string
 	if len(eipsNames) > 0 {
-		describeaddressesoutput, err := ec2sdk.DescribeAddressesRequest(&ec2.DescribeAddressesInput{
+		describeaddressesoutput, err := ec2sdk.DescribeAddressesWithContext(&ec2.DescribeAddressesInput{
 			Filters: []*ec2.Filter{
 				{
 					Name:   aws.String("tag:Name"),
