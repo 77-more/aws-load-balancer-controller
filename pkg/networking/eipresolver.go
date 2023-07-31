@@ -35,7 +35,7 @@ func (p *defaultEIPInfoProvider) ResolveviaNameorAllocationID(eipsNameOrIDs []st
 		//if err != nil {
 		//	return nil, err
 		//}
-		resolvedEIPs = append(resolvedEIPs, AllocationId...)
+		resolvedEIPs = append(resolvedEIPs, eips...)
 		return resolvedEIPs
 	}
 	var availableEIPs []string
