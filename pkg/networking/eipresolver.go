@@ -2,12 +2,11 @@ package networking
 
 import (
 	//"fmt"
-	"strings"
-	awssdk "github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ec2"
 	"sigs.k8s.io/aws-load-balancer-controller/pkg/aws/services"
-	"github.com/aws/aws-sdk-go/service/ec2/ec2iface"
+	//"github.com/aws/aws-sdk-go/service/ec2/ec2iface"
 )
 type defaultEIPInfoProvider struct {
 	ec2Client        services.EC2
