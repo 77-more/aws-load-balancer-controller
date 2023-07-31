@@ -11,7 +11,6 @@ import (
 )
 type defaultEIPInfoProvider struct {
 	ec2Client        services.EC2
-	]
 }
 
 var availableEIPs []string
