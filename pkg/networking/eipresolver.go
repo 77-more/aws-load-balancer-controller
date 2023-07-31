@@ -49,4 +49,3 @@ func (p *defaultEIPInfoProvider) eipresolver(EIPnameOrIDs []string) ([]string) {
         
         return availableEIPs
 }
-}
