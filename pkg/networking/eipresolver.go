@@ -29,19 +29,19 @@ func (p *defaultEIPInfoProvider) ResolveviaNameorAllocationID(eipsNameOrIDs []st
 	}
 	var resolvedEIPs []*ec2sdk.Address
 	if len(allocationIDs) > 0 {
-		eips, err := p.ec2Client.DescribeAddresses(&ec2sdk.DescribeAddressesInput{
+		eips, _ := p.ec2Client.DescribeAddresses(&ec2sdk.DescribeAddressesInput{
 			AllocationIds: awssdk.StringSlice(allocationIDs),
 		})
-		if err != nil {
-			return nil, err
-		}
+		//if err != nil {
+		//	return nil, err
+		//}
 		resolvedEIPs = append(resolvedEIPs, AllocationId...)
 		return resolvedEIPs
 	}
 	var availableEIPs []string
 	var unavailableEIPs []string
 	if len(eipsNames) > 0 {
-		describeaddressesoutput, err := p.ec2Client.DescribeAddresses(&ec2sdk.DescribeAddressesInput{
+		describeaddressesoutput, _ := p.ec2Client.DescribeAddresses(&ec2sdk.DescribeAddressesInput{
 			Filters: []*ec2sdk.Filter{
 				{
 					Name:   aws.String("tag:Name"),
@@ -49,9 +49,9 @@ func (p *defaultEIPInfoProvider) ResolveviaNameorAllocationID(eipsNameOrIDs []st
 				},
 			},
 		})
-		if err != nil {
-			return nil, err
-		}
+		//if err != nil {
+		//	return nil, err
+		//}
 
 		for _, address := range describeaddressesoutput.Addresses {
 			allocationIDs = append(allocationIDs, *address.AllocationId)
