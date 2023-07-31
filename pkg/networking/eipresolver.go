@@ -22,7 +22,7 @@ func ResolveviaNameorAllocationID(eipsNameOrIDs []string) {
 			eipsNames = append(eipsNames, nameOrID)
 		}
 	}
-	var resolvedEIPs []*ec2.Address
+	var resolvedEIPs []*ec2sdk.Address
 	if len(allocationIDs) > 0 {
 		eips, err := ec2sdk.DescribeAddresses(&ec2sdk.DescribeAddressesInput{
 			AllocationIds: awssdk.StringSlice(allocationIDs),
