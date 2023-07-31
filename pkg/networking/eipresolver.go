@@ -5,7 +5,7 @@ import (
 	"strings"
 	awssdk "github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
-	ec2sdk "github.com/aws/aws-sdk-go/service/ec2/ec2"
+	ec2 "github.com/aws/aws-sdk-go/service/ec2"
 	"sigs.k8s.io/aws-load-balancer-controller/pkg/aws/services"
 )
 
@@ -22,9 +22,9 @@ func ResolveviaNameorAllocationID(eipsNameOrIDs []string) {
 			eipsNames = append(eipsNames, nameOrID)
 		}
 	}
-	var resolvedEIPs []*ec2sdk.Address
+	var resolvedEIPs []*ec2.Address
 	if len(allocationIDs) > 0 {
-		eips, err := ec2sdk.DescribeAddresses(&services.ec2.DescribeAddressesInput{
+		eips, err := ec2.DescribeAddresses(&services.ec2.DescribeAddressesInput{
 			AllocationIds: awssdk.StringSlice(allocationIDs),
 		})
 		if err != nil {
@@ -36,7 +36,7 @@ func ResolveviaNameorAllocationID(eipsNameOrIDs []string) {
 	var availableEIPs []string
 	var unavailableEIPs []string
 	if len(eipsNames) > 0 {
-		describeaddressesoutput, err := ec2sdk.DescribeAddresses(&services.ec2.DescribeAddressesInput{
+		describeaddressesoutput, err := ec2.DescribeAddresses(&services.ec2.DescribeAddressesInput{
 			Filters: []*ec2.Filter{
 				{
 					Name:   aws.String("tag:Name"),
