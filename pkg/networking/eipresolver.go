@@ -7,7 +7,17 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	ec2sdk "github.com/aws/aws-sdk-go/service/ec2"
 	"sigs.k8s.io/aws-load-balancer-controller/pkg/aws/services"
+	"github.com/aws/aws-sdk-go/service/ec2/ec2iface"
 )
+func NewEC2(session *session.Session) EC2 {
+	return &defaultEC2{
+		EC2API: ec2.New(session),
+	}
+}
+
+type defaultEC2 struct {
+	ec2iface.EC2API
+}
 
 func ResolveviaNameorAllocationID(eipsNameOrIDs []string) {
 	// Creates session object
@@ -22,9 +32,9 @@ func ResolveviaNameorAllocationID(eipsNameOrIDs []string) {
 			eipsNames = append(eipsNames, nameOrID)
 		}
 	}
-	var resolvedEIPs []*ec2sdk.Address
+	var resolvedEIPs []*EC2.Address
 	if len(allocationIDs) > 0 {
-		eips, err := ec2sdk.DescribeAddresses(&ec2sdk.DescribeAddressesInput{
+		eips, err := ec2sdk.DescribeAddresses(&EC2.DescribeAddressesInput{
 			AllocationIds: awssdk.StringSlice(allocationIDs),
 		})
 		if err != nil {
@@ -36,8 +46,8 @@ func ResolveviaNameorAllocationID(eipsNameOrIDs []string) {
 	var availableEIPs []string
 	var unavailableEIPs []string
 	if len(eipsNames) > 0 {
-		describeaddressesoutput, err := ec2sdk.DescribeAddresses(&ec2sdk.DescribeAddressesInput{
-			Filters: []*ec2sdk.Filter{
+		describeaddressesoutput, err := EC2.DescribeAddresses(&EC2.DescribeAddressesInput{
+			Filters: []*EC2.Filter{
 				{
 					Name:   aws.String("tag:Name"),
 					Values: aws.StringSlice(eipsNames),
