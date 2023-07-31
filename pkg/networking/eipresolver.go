@@ -5,7 +5,7 @@ import (
 	"strings"
 	awssdk "github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
-	ec2sdk "github.com/aws/aws-sdk-go/service/ec2"
+	ec2sdk "github.com/aws/aws-sdk-go/service/ec2/ec2"
 	"sigs.k8s.io/aws-load-balancer-controller/pkg/aws/services"
 )
 
