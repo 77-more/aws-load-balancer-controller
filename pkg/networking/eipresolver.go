@@ -12,17 +12,19 @@ type EIPInfoProvider struct {
 	ec2Client        services.EC2
 }
 
-var availableEIPs []string
-var unavailableEIPs []string
-func (p *EIPInfoProvider) EIPResolver(EIPnameOrIDs []string) ([]string) {
+func eipresolver(EIPnameOrIDs []string) []string {
 	// Creates session object
-	//sess, _ := session.NewSession()
+	sess, _ := session.NewSession()
 	// opens a new session
-	//ec2svc := ec2.New(sess)
+	ec2svc := ec2.New(sess)
 	// makes DescribeAddresses api call and stores the output of type DescribeAddressesOutput in results variable. As part of the API call we are looking for Name: test1 and cluster-name:test tags
 	// &ec2.DescribeAddressesInput represents the memory address of the
+	var availableEIPs []string
+	if len(EIPnameOrIDs) == 0 {
+		return availableEIPs
+	}
 	for _, nameOrIDs := range EIPnameOrIDs {
-		results, _ := p.ec2Client.DescribeAddresses(&ec2.DescribeAddressesInput{
+		results, _ := ec2svc.DescribeAddresses(&ec2.DescribeAddressesInput{
 			Filters: []*ec2.Filter{
 				{
 					Name:   aws.String("tag:Name"),
@@ -30,21 +32,19 @@ func (p *EIPInfoProvider) EIPResolver(EIPnameOrIDs []string) ([]string) {
 				},
 			},
 		})
-		
-		var allocationIDs []string
-		var associationIDs []string
-
-		allocationIDs = append(allocationIDs, *results.Addresses[0].AllocationId)
-		associationIDs = append(associationIDs, *results.Addresses[0].AssociationId)
-		if len(associationIDs) > 0 {
-			unavailableEIPs = append(unavailableEIPs, *results.Addresses[0].AllocationId)
-		} else {
-			availableEIPs = append(availableEIPs, *results.Addresses[0].AllocationId)
+		//if the region is set wrong then the results.Addresses len will be 0 so we need to account for that condition as well.
+		if len(results.Addresses) == 0 {
+			continue
 		}
-		associationIDs = nil
-	
-		} 
-	//	fmt.Printf("available EIPs:%v, unavailableEIPs:%v", availableEIPs, unavailableEIPs)
-        
-        return availableEIPs
+		// *results.Addresses[0].AllocationId is the pointer to the value in AllocationId
+		// results.Addresses[0].AllocationId is the address of the AllocationId field
+		allocationIDs := *results.Addresses[0].AllocationId
+		// the below if condition checks if the AssociationId field exists or no NOTE we are not looking for the address of the field or the value in the address, we are simply looking for the existence of the field itself.
+
+		if results.Addresses[0].AssociationId == nil {
+			availableEIPs = append(availableEIPs, allocationIDs)
+		}
+	}
+	return availableEIPs
 }
+
