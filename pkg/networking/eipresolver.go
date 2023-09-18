@@ -24,7 +24,7 @@ func (r *EIPInfoProvider) EIPResolver(EIPnameOrIDs []string) []string {
 		return availableEIPs
 	}
 	for _, nameOrIDs := range EIPnameOrIDs {
-		results, _ := e.ec2Client.DescribeAddresses(&ec2.DescribeAddressesInput{
+		results, _ := r.ec2Client.DescribeAddresses(&ec2.DescribeAddressesInput{
 			Filters: []*ec2.Filter{
 				{
 					Name:   aws.String("tag:Name"),
