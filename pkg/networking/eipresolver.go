@@ -8,11 +8,11 @@ import (
 	"sigs.k8s.io/aws-load-balancer-controller/pkg/aws/services"
 	//"github.com/aws/aws-sdk-go/service/ec2/ec2iface"
 )
-type EIPInfoProvider struct {
+type eipinfoprovider struct {
 	ec2Client        services.EC2
 }
 
-func (r *EIPInfoProvider) EIPResolver(EIPnameOrIDs []string) []string {
+func (r *eipinfoprovider) EIPResolver(EIPnameOrIDs []string) []string {
 	// Creates session object
 	//sess, _ := session.NewSession()
 	// opens a new session
