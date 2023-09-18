@@ -7,6 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/ec2"
 	"sigs.k8s.io/aws-load-balancer-controller/pkg/aws/services"
 	//"github.com/aws/aws-sdk-go/service/ec2/ec2iface"
+	"strings"
 )
 //type eipinfoprovider struct {
 //	ec2Client        services.EC2
