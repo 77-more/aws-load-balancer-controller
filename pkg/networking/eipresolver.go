@@ -3,7 +3,7 @@ package networking
 import (
 	//"fmt"
 	"github.com/aws/aws-sdk-go/aws"
-	//"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ec2"
 	"sigs.k8s.io/aws-load-balancer-controller/pkg/aws/services"
 	//"github.com/aws/aws-sdk-go/service/ec2/ec2iface"
@@ -12,19 +12,36 @@ import (
 //	ec2Client        services.EC2
 //}
 
-func EIPResolver(EIPnameOrIDs []string) []string {
+func EIPResolver (EIPnameOrIDs []string) []string {
 	// Creates session object
-	//sess, _ := session.NewSession()
+	sess, _ := session.NewSession()
 	// opens a new session
-	//ec2svc := ec2.New(sess)
-	// makes DescribeAddresses api call and stores the output of type DescribeAddressesOutput in results variable. As part of the API call we are looking for Name: test1 and cluster-name:test tags
+	ec2svc := ec2.New(sess)
+	// makes DescribeAddresses api call and stores the output of type DescribeAddressesOutput in results variable.
+	//As part of the API call we are looking for Name: test1 and cluster-name:test tags
 	// &ec2.DescribeAddressesInput represents the memory address of the
 	var availableEIPs []string
 	if len(EIPnameOrIDs) == 0 {
 		return availableEIPs
 	}
 	for _, nameOrIDs := range EIPnameOrIDs {
-		results, _ := r.ec2Client.DescribeAddresses(&ec2.DescribeAddressesInput{
+		if strings.HasPrefix(nameOrIDs, "eipalloc-") {
+			results, _ := ec2svc.DescribeAddresses(&ec2.DescribeAddressesInput{
+				Filters: []*ec2.Filter{
+					{
+						Name:   aws.String("allocation-id"),
+						Values: aws.StringSlice([]string{nameOrIDs}),
+					},
+				},
+			})
+			if len(results.Addresses) == 0 {
+				continue
+			}
+			if results.Addresses[0].AssociationId == nil {
+				availableEIPs = append(availableEIPs, nameOrIDs)
+			}
+		}
+		results, _ := ec2svc.DescribeAddresses(&ec2.DescribeAddressesInput{
 			Filters: []*ec2.Filter{
 				{
 					Name:   aws.String("tag:Name"),
