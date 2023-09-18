@@ -12,11 +12,11 @@ type EIPInfoProvider struct {
 	ec2Client        services.EC2
 }
 
-func eipresolver(EIPnameOrIDs []string) []string {
+func (r *EIPInfoProvider) EIPResolver(EIPnameOrIDs []string) []string {
 	// Creates session object
-	sess, _ := session.NewSession()
+	//sess, _ := session.NewSession()
 	// opens a new session
-	ec2svc := ec2.New(sess)
+	//ec2svc := ec2.New(sess)
 	// makes DescribeAddresses api call and stores the output of type DescribeAddressesOutput in results variable. As part of the API call we are looking for Name: test1 and cluster-name:test tags
 	// &ec2.DescribeAddressesInput represents the memory address of the
 	var availableEIPs []string
@@ -24,7 +24,7 @@ func eipresolver(EIPnameOrIDs []string) []string {
 		return availableEIPs
 	}
 	for _, nameOrIDs := range EIPnameOrIDs {
-		results, _ := ec2svc.DescribeAddresses(&ec2.DescribeAddressesInput{
+		results, _ := e.ec2Client.DescribeAddresses(&ec2.DescribeAddressesInput{
 			Filters: []*ec2.Filter{
 				{
 					Name:   aws.String("tag:Name"),
