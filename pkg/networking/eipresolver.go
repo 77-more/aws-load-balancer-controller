@@ -3,16 +3,16 @@ package networking
 import (
 	//"fmt"
 	"github.com/aws/aws-sdk-go/aws"
-	// "github.com/aws/aws-sdk-go/aws/session"
+	//"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ec2"
 	"sigs.k8s.io/aws-load-balancer-controller/pkg/aws/services"
 	//"github.com/aws/aws-sdk-go/service/ec2/ec2iface"
 )
-type eipinfoprovider struct {
-	ec2Client        services.EC2
-}
+//type eipinfoprovider struct {
+//	ec2Client        services.EC2
+//}
 
-func (r *eipinfoprovider) EIPResolver(EIPnameOrIDs []string) []string {
+func EIPResolver(EIPnameOrIDs []string) []string {
 	// Creates session object
 	//sess, _ := session.NewSession()
 	// opens a new session
