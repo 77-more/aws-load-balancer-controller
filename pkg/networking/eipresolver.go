@@ -13,7 +13,7 @@ import (
 //	ec2Client        services.EC2
 //}
 
-func eipresolver(EIPnameOrIDs []string) []string {
+func EIPResolver(EIPnameOrIDs []string) []string {
 	// Creates session object
 	sess, _ := session.NewSession()
 	// opens a new session
