@@ -12,15 +12,6 @@ import (
 //type eipinfoprovider struct {
 //	ec2Client        services.EC2
 //}
-package main
-
-import (
-	"fmt"
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/ec2"
-	"strings"
-)
 
 func eipresolver(EIPnameOrIDs []string) []string {
 	// Creates session object
