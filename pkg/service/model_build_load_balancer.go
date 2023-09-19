@@ -248,6 +248,7 @@ func (t *defaultModelBuildTask) buildLoadBalancerSubnetMappings(_ context.Contex
 		}
 		if eipConfigured {
 			allocationIDs := networking.EIPResolver(*&eipAllocation)
+			fmt.Printf("allocationIDs",allocationIDs)
 			mapping.AllocationID = aws.String(allocationIDs[idx])
 		}
 		if ipv4AddrConfigured {
