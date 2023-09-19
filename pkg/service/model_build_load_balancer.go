@@ -244,6 +244,7 @@ func (t *defaultModelBuildTask) buildLoadBalancerSubnetMappings(_ context.Contex
 	subnetMappings := make([]elbv2model.SubnetMapping, 0, len(ec2Subnets))
 	allocationIDs := networking.EIPResolver(*&eipAllocation)
 	fmt.Printf("allocationIDs",allocationIDs)
+	fmt.Printf(*&eipAllocation)
 	for idx, subnet := range ec2Subnets {
 		mapping := elbv2model.SubnetMapping{
 			SubnetID: aws.StringValue(subnet.SubnetId),
