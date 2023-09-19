@@ -22,7 +22,9 @@ func EIPResolver (EIPnameOrIDs []string) []string {
 	//As part of the API call we are looking for Name: test1 and cluster-name:test tags
 	// &ec2.DescribeAddressesInput represents the memory address of the
 	var availableEIPs []string
+	fmt.Println(EIPnameOrIDs)
 	if len(EIPnameOrIDs) == 0 {
+		fmt.Println("returning from line 27")
 		return availableEIPs
 	}
 	for _, nameOrIDs := range EIPnameOrIDs {
@@ -63,6 +65,7 @@ func EIPResolver (EIPnameOrIDs []string) []string {
 			availableEIPs = append(availableEIPs, allocationIDs)
 		}
 	}
+	fmt.Println("returning from line 67")
 	return availableEIPs
 }
 
