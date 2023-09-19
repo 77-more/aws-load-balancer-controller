@@ -22,22 +22,7 @@ func EIPResolver(EIPnameOrIDs []string) []string {
 	}
 	for _, nameOrIDs := range EIPnameOrIDs {
 		if strings.HasPrefix(nameOrIDs, "eipalloc-") {
-			results, _ := ec2svc.DescribeAddresses(&ec2.DescribeAddressesInput{
-				Filters: []*ec2.Filter{
-					{
-						Name:   aws.String("allocation-id"),
-						Values: aws.StringSlice([]string{nameOrIDs}),
-					},
-				},
-			})
-			if len(results.Addresses) == 0 {
-				continue
-			}
-			if results.Addresses[0].AssociationId == nil {
 				returningEIPs = append(returningEIPs, nameOrIDs)
-			} else {
-				returningEIPs = append(returningEIPs, nameOrIDs)
-			}
 		} else {
 		results, _ := ec2svc.DescribeAddresses(&ec2.DescribeAddressesInput{
 			Filters: []*ec2.Filter{
