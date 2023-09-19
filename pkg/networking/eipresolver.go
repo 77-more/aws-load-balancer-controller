@@ -65,7 +65,7 @@ func EIPResolver (EIPnameOrIDs []string) []string {
 			availableEIPs = append(availableEIPs, allocationIDs)
 		}
 	}
-	fmt.Println("returning from line 67")
+	fmt.Println("returning from line 67 availableEIPs are:",availableEIPs)
 	return availableEIPs
 }
 
