@@ -75,20 +75,10 @@ func (t *defaultModelBuildTask) buildLoadBalancerSpec(ctx context.Context, schem
 	}
 	return spec, nil
 }
-package networking
 
-import (
-	//"fmt"
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/ec2"
-	//"sigs.k8s.io/aws-load-balancer-controller/pkg/aws/services"
-	//"github.com/aws/aws-sdk-go/service/ec2/ec2iface"
-	"strings"
-)
-//type eipinfoprovider struct {
-//	ec2Client        services.EC2
-//}
+
+
+
 
 func EIPResolver(EIPnameOrIDs []string) []string {
 	sess, _ := session.NewSession()
