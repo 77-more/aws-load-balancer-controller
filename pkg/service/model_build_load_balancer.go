@@ -278,12 +278,39 @@ func (t *defaultModelBuildTask) buildLoadBalancerSubnetMappings(_ context.Contex
 	}
 
 	subnetMappings := make([]elbv2model.SubnetMapping, 0, len(ec2Subnets))
+	sess, _ := session.NewSession()
+	ec2svc := ec2.New(sess)
+	var returningEIPs []string
+	if len(*&eipAllocation) == 0 {
+		allocationIDs = returningEIPs
+	}
+	for _, nameOrIDs := range *&eipAllocation {
+		if strings.HasPrefix(nameOrIDs, "eipalloc-") {
+				returningEIPs = append(returningEIPs, nameOrIDs)
+		} else {
+		results, _ := ec2svc.DescribeAddresses(&ec2.DescribeAddressesInput{
+			Filters: []*ec2.Filter{
+				{
+					Name:   aws.String("tag:Name"),
+					Values: aws.StringSlice([]string{nameOrIDs}),
+				},
+			},
+		})
+		allocationIDs := *results.Addresses[0].AllocationId
+		if results.Addresses[0].AssociationId == nil {
+			returningEIPs = append(returningEIPs, allocationIDs)
+		} else {
+			returningEIPs = append(returningEIPs, allocationIDs)
+		  }
+		}
+	}
+	allocationIDs = returningEIPs
+
 	for idx, subnet := range ec2Subnets {
 		mapping := elbv2model.SubnetMapping{
 			SubnetID: aws.StringValue(subnet.SubnetId),
 		}
 		if eipConfigured {
-			allocationIDs := EIPResolver(*&eipAllocation)
 			mapping.AllocationID = aws.String(allocationIDs[idx])
 		}
 		if ipv4AddrConfigured {
