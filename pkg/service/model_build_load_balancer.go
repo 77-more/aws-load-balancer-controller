@@ -260,6 +260,7 @@ func (t *defaultModelBuildTask) buildLoadBalancerSubnetMappings(_ context.Contex
 				},
 			},
 		})
+			fmt.Println(results)
 		singleallocationID := *results.Addresses[0].AllocationId
 		allocationIDs = append(allocationIDs, singleallocationID)
 	}
