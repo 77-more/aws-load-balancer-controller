@@ -76,40 +76,6 @@ func (t *defaultModelBuildTask) buildLoadBalancerSpec(ctx context.Context, schem
 	return spec, nil
 }
 
-
-
-
-
-func EIPResolver(EIPnameOrIDs []string) []string {
-	sess, _ := session.NewSession()
-	ec2svc := ec2.New(sess)
-	var returningEIPs []string
-	if len(EIPnameOrIDs) == 0 {
-		return returningEIPs
-	}
-	for _, nameOrIDs := range EIPnameOrIDs {
-		if strings.HasPrefix(nameOrIDs, "eipalloc-") {
-				returningEIPs = append(returningEIPs, nameOrIDs)
-		} else {
-		results, _ := ec2svc.DescribeAddresses(&ec2.DescribeAddressesInput{
-			Filters: []*ec2.Filter{
-				{
-					Name:   aws.String("tag:Name"),
-					Values: aws.StringSlice([]string{nameOrIDs}),
-				},
-			},
-		})
-		allocationIDs := *results.Addresses[0].AllocationId
-		if results.Addresses[0].AssociationId == nil {
-			returningEIPs = append(returningEIPs, allocationIDs)
-		} else {
-			returningEIPs = append(returningEIPs, allocationIDs)
-		  }
-		}
-	}
-	return returningEIPs
-}
-
 func (t *defaultModelBuildTask) buildLoadBalancerIPAddressType(_ context.Context) (elbv2model.IPAddressType, error) {
 	rawIPAddressType := ""
 	if exists := t.annotationParser.ParseStringAnnotation(annotations.SvcLBSuffixIPAddressType, &rawIPAddressType, t.service.Annotations); !exists {
@@ -280,7 +246,7 @@ func (t *defaultModelBuildTask) buildLoadBalancerSubnetMappings(_ context.Contex
 	subnetMappings := make([]elbv2model.SubnetMapping, 0, len(ec2Subnets))
 	sess, _ := session.NewSession()
 	ec2svc := ec2.New(sess)
-	var returningEIPs []string
+	var returningEIPs,allocationIDs []string
 	if len(*&eipAllocation) == 0 {
 		allocationIDs = returningEIPs
 	}
