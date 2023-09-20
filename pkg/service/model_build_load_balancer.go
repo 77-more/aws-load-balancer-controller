@@ -248,6 +248,7 @@ func (t *defaultModelBuildTask) buildLoadBalancerSubnetMappings(_ context.Contex
 	ec2svc := ec2.New(sess)
 	var allocationIDs []string
 	for _, nameOrIDs := range *&eipAllocation {
+		fmt.Println(nameOrIDs)
 		if strings.HasPrefix(nameOrIDs, "eipalloc-") {
 				allocationIDs = append(allocationIDs, nameOrIDs)
 		} else {
