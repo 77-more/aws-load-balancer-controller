@@ -249,7 +249,7 @@ func (t *defaultModelBuildTask) buildLoadBalancerSubnetMappings(_ context.Contex
 	var returningEIPs,allocationIDs []string
 	if len(*&eipAllocation) == 0 {
 		allocationIDs = returningEIPs
-	}
+	} else {
 	for _, nameOrIDs := range *&eipAllocation {
 		if strings.HasPrefix(nameOrIDs, "eipalloc-") {
 				returningEIPs = append(returningEIPs, nameOrIDs)
@@ -263,15 +263,12 @@ func (t *defaultModelBuildTask) buildLoadBalancerSubnetMappings(_ context.Contex
 			},
 		})
 		allocationIDs := *results.Addresses[0].AllocationId
-		if results.Addresses[0].AssociationId == nil {
-			returningEIPs = append(returningEIPs, allocationIDs)
-		} else {
-			returningEIPs = append(returningEIPs, allocationIDs)
-		  }
-		}
+		returningEIPs = append(returningEIPs, allocationIDs)
 	}
+        }
 	allocationIDs = returningEIPs
-
+        }
+        
 	for idx, subnet := range ec2Subnets {
 		mapping := elbv2model.SubnetMapping{
 			SubnetID: aws.StringValue(subnet.SubnetId),
