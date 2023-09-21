@@ -262,6 +262,7 @@ func (t *defaultModelBuildTask) buildLoadBalancerSubnetMappings(_ context.Contex
 		})
 		if len(results.Addresses) == 0 {
 				fmt.Println("empty")
+			        allocationIDs = append(allocationIDs, "")
 		} else {
 				singleallocationID := *results.Addresses[0].AllocationId
 				allocationIDs = append(allocationIDs, singleallocationID)
