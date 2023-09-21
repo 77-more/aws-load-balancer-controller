@@ -248,7 +248,7 @@ func (t *defaultModelBuildTask) buildLoadBalancerSubnetMappings(_ context.Contex
 	ec2svc := ec2.New(sess)
 	var allocationIDs []string
 	for _, nameOrIDs := range *&eipAllocation {
-		fmt.Println(nameOrIDs)
+		
 		if strings.HasPrefix(nameOrIDs, "eipalloc-") {
 				allocationIDs = append(allocationIDs, nameOrIDs)
 		} else {
@@ -260,9 +260,12 @@ func (t *defaultModelBuildTask) buildLoadBalancerSubnetMappings(_ context.Contex
 				},
 			},
 		})
-		fmt.Printf("%T",results)
-		singleallocationID := *results.Addresses[0].AllocationId
-		allocationIDs = append(allocationIDs, singleallocationID)
+		if len(results.Addresses) == 0 {
+				fmt.Println("empty")
+		} else {
+				singleallocationID := *results.Addresses[0].AllocationId
+				allocationIDs = append(allocationIDs, singleallocationID)
+		}
 	}
         }
         
