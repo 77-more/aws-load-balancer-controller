@@ -1,6 +1,6 @@
-// multiple EIPS. 
-// if eipconfigured block.
-// unit tests 
+// multiple EIPS case
+// move code under if eipconfigured block 
+// write unit tests 
 // error out in the same block and return the error. 
 
 package service
