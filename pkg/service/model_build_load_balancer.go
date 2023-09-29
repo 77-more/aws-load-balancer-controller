@@ -1,3 +1,8 @@
+// multiple EIPS. 
+// if eipconfigured block.
+// unit tests 
+// error out in the same block and return the error. 
+
 package service
 
 import (
@@ -195,6 +200,31 @@ func (t *defaultModelBuildTask) buildLoadBalancerSubnetMappings(_ context.Contex
 		if len(eipAllocation) != len(ec2Subnets) {
 			return nil, errors.Errorf("count of EIP allocations (%d) and subnets (%d) must match", len(eipAllocation), len(ec2Subnets))
 		}
+		// beginning 
+		var allocationIDs []string
+		for _, nameOrIDs := range *&eipAllocation {
+			
+			if strings.HasPrefix(nameOrIDs, "eipalloc-") {
+					allocationIDs = append(allocationIDs, nameOrIDs)
+			} else {
+			results, _ := ec2svc.DescribeAddresses(&ec2.DescribeAddressesInput{
+				Filters: []*ec2.Filter{
+					{
+						Name:   aws.String("tag:Name"),
+						Values: aws.StringSlice([]string{nameOrIDs}),
+					},
+				},
+			})
+			if len(results.Addresses) == 0 {
+					fmt.Println("no EIPs found for this name")
+				        allocationIDs = append(allocationIDs, "")
+			} else {
+					singleallocationID := *results.Addresses[0].AllocationId
+					allocationIDs = append(allocationIDs, singleallocationID)
+			}
+		}
+	        }
+		//  end of my code. 
 	}
 
 	var ipv4Addresses []netip.Addr
@@ -246,29 +276,7 @@ func (t *defaultModelBuildTask) buildLoadBalancerSubnetMappings(_ context.Contex
 	subnetMappings := make([]elbv2model.SubnetMapping, 0, len(ec2Subnets))
 	sess, _ := session.NewSession()
 	ec2svc := ec2.New(sess)
-	var allocationIDs []string
-	for _, nameOrIDs := range *&eipAllocation {
-		
-		if strings.HasPrefix(nameOrIDs, "eipalloc-") {
-				allocationIDs = append(allocationIDs, nameOrIDs)
-		} else {
-		results, _ := ec2svc.DescribeAddresses(&ec2.DescribeAddressesInput{
-			Filters: []*ec2.Filter{
-				{
-					Name:   aws.String("tag:Name"),
-					Values: aws.StringSlice([]string{nameOrIDs}),
-				},
-			},
-		})
-		if len(results.Addresses) == 0 {
-				fmt.Println("empty")
-			        allocationIDs = append(allocationIDs, "")
-		} else {
-				singleallocationID := *results.Addresses[0].AllocationId
-				allocationIDs = append(allocationIDs, singleallocationID)
-		}
-	}
-        }
+
         
 	for idx, subnet := range ec2Subnets {
 		mapping := elbv2model.SubnetMapping{
@@ -276,6 +284,7 @@ func (t *defaultModelBuildTask) buildLoadBalancerSubnetMappings(_ context.Contex
 		}
 		if eipConfigured {
 			mapping.AllocationID = aws.String(allocationIDs[idx])
+			return nil, err
 		}
 		if ipv4AddrConfigured {
 			subnetIPv4CIDRs, err := networking.GetSubnetAssociatedIPv4CIDRs(subnet)
