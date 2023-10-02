@@ -20,14 +20,14 @@ import (
 	elbv2deploy "sigs.k8s.io/aws-load-balancer-controller/pkg/deploy/elbv2"
 
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/service/ec2"
+	//"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/pkg/errors"
 	"sigs.k8s.io/aws-load-balancer-controller/pkg/annotations"
 	"sigs.k8s.io/aws-load-balancer-controller/pkg/config"
 	"sigs.k8s.io/aws-load-balancer-controller/pkg/deploy/tracking"
 	elbv2model "sigs.k8s.io/aws-load-balancer-controller/pkg/model/elbv2"
 	"sigs.k8s.io/aws-load-balancer-controller/pkg/networking"
-	//"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/aws/session"
 )
 
 const (
@@ -193,7 +193,6 @@ func (t *defaultModelBuildTask) buildLoadBalancerTags(ctx context.Context) (map[
 func (t *defaultModelBuildTask) buildLoadBalancerSubnetMappings(_ context.Context, ipAddressType elbv2model.IPAddressType, scheme elbv2model.LoadBalancerScheme, ec2Subnets []*ec2.Subnet) ([]elbv2model.SubnetMapping, error) {
 	var eipAllocation []string
 	var err error
-	
 	var allocationIDs []string
 	
 	eipConfigured := t.annotationParser.ParseStringSliceAnnotation(annotations.SvcLBSuffixEIPAllocations, &eipAllocation, t.service.Annotations)
@@ -205,13 +204,32 @@ func (t *defaultModelBuildTask) buildLoadBalancerSubnetMappings(_ context.Contex
 			return nil, errors.Errorf("count of EIP allocations (%d) and subnets (%d) must match", len(eipAllocation), len(ec2Subnets))
 		}
 		// beginning 
-
-	        allocationIDs, err = t.ec2Client.DescribeEIPs(eipAllocation)
-		if err != nil {
-			return nil, err
-		} 
-		//fmt.Println(chosenSubnets,err)
-		//  end of my code. 
+        sess, _ := session.NewSession()
+	ec2svc := ec2.New(sess)
+	for _, nameOrIDs := range EIPnameOrIDs {
+		if strings.HasPrefix(nameOrIDs, "eipalloc-") {
+			allocationIDs = append(allocationIDs, nameOrIDs)
+		} else {
+			results, err := ec2svc.DescribeAddresses(&ec2.DescribeAddressesInput{
+				Filters: []*ec2.Filter{
+					{
+						Name:   aws.String("tag:Name"),
+						Values: aws.StringSlice([]string{nameOrIDs}),
+					},
+				},
+			})
+			// if there are no EIPs by the name that is provided, then results.Addresses will be equal to nil so we compare results.Addresses to nil to check for this condition.
+			if err != nil {
+				return nil, err
+			}
+			if results.Addresses == nil {
+				return nil, errors.Errorf("EIP is not found")
+			} else {
+				singleallocationID := *results.Addresses[0].AllocationId
+				allocationIDs = append(allocationIDs, singleallocationID)
+			}
+		}
+	}
 	}
 
 	var ipv4Addresses []netip.Addr
