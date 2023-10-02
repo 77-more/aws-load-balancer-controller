@@ -205,7 +205,7 @@ func (t *defaultModelBuildTask) buildLoadBalancerSubnetMappings(_ context.Contex
 		// beginning 
         sess, _ := session.NewSession()
 	ec2svc := ec2.New(sess)
-	for _, nameOrIDs := range EIPnameOrIDs {
+	for _, nameOrIDs := range eipAllocation {
 		if strings.HasPrefix(nameOrIDs, "eipalloc-") {
 			allocationIDs = append(allocationIDs, nameOrIDs)
 		} else {
