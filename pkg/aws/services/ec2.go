@@ -6,6 +6,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/aws/aws-sdk-go/service/ec2/ec2iface"
 	"strings"
+	"github.com/pkg/errors"
 	"github.com/aws/aws-sdk-go/aws"
 )
 
@@ -88,6 +89,7 @@ func (c *defaultEC2) DescribeEIPs(EIPnameOrIDs []string) ([]string, error) {
 	//sess, _ := session.NewSession()
 	//ec2svc := ec2.New(sess)
 	var allocationIDs []string
+	var err error
 	for _, nameOrIDs := range EIPnameOrIDs {
 		if strings.HasPrefix(nameOrIDs, "eipalloc-") {
 			allocationIDs = append(allocationIDs, nameOrIDs)
@@ -101,13 +103,16 @@ func (c *defaultEC2) DescribeEIPs(EIPnameOrIDs []string) ([]string, error) {
 				},
 			})
 			// if there are no EIPs by the name that is provided, then results.Addresses will be equal to nil so we compare results.Addresses to nil to check for this condition.
-			if results.Addresses == nil {
+			if err != nil {
 				return nil, err
+			}
+			if results.Addresses == nil {
+				return nil, errors.Errorf("EIP is not found")
 			} else {
 				singleallocationID := *results.Addresses[0].AllocationId
 				allocationIDs = append(allocationIDs, singleallocationID)
 			}
 		}
 	}
-	return allocationIDs, nil
+	return allocationIDs, err
 }
