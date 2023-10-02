@@ -141,6 +141,7 @@ type defaultModelBuildTask struct {
 	featureGates        config.FeatureGates
 	serviceUtils        ServiceUtils
 	enableIPTargetType  bool
+	ec2Client           services.EC2
 
 	service *corev1.Service
 
