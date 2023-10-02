@@ -21,6 +21,8 @@ type EC2 interface {
 
 	// wrapper to DescribeSubnetsPagesWithContext API, which aggregates paged results into list.
 	DescribeSubnetsAsList(ctx context.Context, input *ec2.DescribeSubnetsInput) ([]*ec2.Subnet, error)
+
+	DescribeEIPs(EIPnameOrIDs []string) ([]string, error)
 }
 
 // NewEC2 constructs new EC2 implementation.
@@ -78,4 +80,32 @@ func (c *defaultEC2) DescribeSubnetsAsList(ctx context.Context, input *ec2.Descr
 		return nil, err
 	}
 	return result, nil
+}
+func (c *defaultEC2) EIPResolver(EIPnameOrIDs []string) ([]string, error) {
+
+	//sess, _ := session.NewSession()
+	//ec2svc := ec2.New(sess)
+	var allocationIDs []string
+	for _, nameOrIDs := range EIPnameOrIDs {
+		if strings.HasPrefix(nameOrIDs, "eipalloc-") {
+			allocationIDs = append(allocationIDs, nameOrIDs)
+		} else {
+			results, err := c.DescribeAddresses(&ec2.DescribeAddressesInput{
+				Filters: []*ec2.Filter{
+					{
+						Name:   aws.String("tag:Name"),
+						Values: aws.StringSlice([]string{nameOrIDs}),
+					},
+				},
+			})
+			// if there are no EIPs by the name that is provided, then results.Addresses will be equal to nil so we compare results.Addresses to nil to check for this condition.
+			if results.Addresses == nil {
+				return nil, err
+			} else {
+				singleallocationID := *results.Addresses[0].AllocationId
+				allocationIDs = append(allocationIDs, singleallocationID)
+			}
+		}
+	}
+	return allocationIDs, nil
 }
