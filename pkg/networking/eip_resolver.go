@@ -28,9 +28,9 @@ func EIPResolver (eipAllocation []string) ([]string, error) {
 			})
 			// if there are no EIPs by the name that is provided, then results.Addresses will be equal to nil so we compare results.Addresses to nil to check for this condition.
 			// if the EIP that customer wants to use is already associated with another component, then the EIP will have an association ID, it that case we can error out. 
-			//if *results.Addresses[0].AssociationId != "" {
-			//	return nil, errors.Errorf("EIP by the name %s is in use already, please provide a different EIP name or allocation ID", nameOrIDs)
-			//}
+			if *results.Addresses[0].AssociationId != "" {
+				return nil, errors.Errorf("EIP by the name %s is in use already, please provide a different EIP name or allocation ID", nameOrIDs)
+			}
 			if err != nil {
 				return nil, err
 			}
