@@ -206,7 +206,7 @@ func (t *defaultModelBuildTask) buildLoadBalancerSubnetMappings(_ context.Contex
 		// beginning 
 
 	        allocationIDs, err = t.ec2Client.DescribeEIPs(eipAllocation)
-		fmt.Println(chosenSubnets,err)
+		//fmt.Println(chosenSubnets,err)
 		//  end of my code. 
 	}
 
