@@ -31,7 +31,7 @@ func EIPResolver (eipAllocation []string) ([]string, error) {
 				return nil, err
 			}
 			if results.Addresses == nil {
-				return nil, errors.Errorf("No EIP by the name %s is found",nameOrIDs)
+				return nil, errors.Errorf("EIP %s is not found, please provide a valid EIP name",nameOrIDs)
 			} else {
 				singleallocationID := *results.Addresses[0].AllocationId
 				allocationIDs = append(allocationIDs, singleallocationID)
