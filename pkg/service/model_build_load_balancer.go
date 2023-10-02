@@ -203,7 +203,7 @@ func (t *defaultModelBuildTask) buildLoadBalancerSubnetMappings(_ context.Contex
 			return nil, errors.Errorf("count of EIP allocations (%d) and subnets (%d) must match", len(eipAllocation), len(ec2Subnets))
 		}
 		// beginning 
-                allocationIDs, err = t.networking.EIPResolver(eipAllocation)
+                allocationIDs, err = networking.EIPResolver(eipAllocation)
 		if err != nil {
 			return nil, err
 		}
