@@ -27,6 +27,9 @@ func EIPResolver (eipAllocation []string) ([]string, error) {
 				},
 			})
 			// if there are no EIPs by the name that is provided, then results.Addresses will be equal to nil so we compare results.Addresses to nil to check for this condition.
+			if results.Addresses.AllocationId == nil {
+				return nil, errors.Errorf("EIP by the name %s is in use already, please provide a different EIP name or allocation ID", nameOrIDs)
+			}
 			if err != nil {
 				return nil, err
 			}
