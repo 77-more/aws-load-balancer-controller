@@ -14,7 +14,7 @@ import (
 	"regexp"
 	"sort"
 	"strconv"
-	"strings"
+	//"strings"
 
 	"sigs.k8s.io/aws-load-balancer-controller/pkg/algorithm"
 	elbv2deploy "sigs.k8s.io/aws-load-balancer-controller/pkg/deploy/elbv2"
@@ -27,7 +27,7 @@ import (
 	"sigs.k8s.io/aws-load-balancer-controller/pkg/deploy/tracking"
 	elbv2model "sigs.k8s.io/aws-load-balancer-controller/pkg/model/elbv2"
 	"sigs.k8s.io/aws-load-balancer-controller/pkg/networking"
-	"github.com/aws/aws-sdk-go/aws/session"
+	//"github.com/aws/aws-sdk-go/aws/session"
 )
 
 const (
