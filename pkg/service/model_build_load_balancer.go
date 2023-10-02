@@ -194,9 +194,10 @@ func (t *defaultModelBuildTask) buildLoadBalancerSubnetMappings(_ context.Contex
 	var eipAllocation []string
 	//var err error
 	var allocationIDs []string
-	var err error
+	
 	eipConfigured := t.annotationParser.ParseStringSliceAnnotation(annotations.SvcLBSuffixEIPAllocations, &eipAllocation, t.service.Annotations)
 	if eipConfigured {
+		var err error
 		if scheme != elbv2model.LoadBalancerSchemeInternetFacing {
 			return nil, errors.Errorf("EIP allocations can only be set for internet facing load balancers")
 		}
