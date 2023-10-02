@@ -1,7 +1,7 @@
 package networking
 
 import (
-	"fmt"
+	//"fmt"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ec2"
@@ -10,7 +10,9 @@ import (
 )
 
 func EIPResolver (eipAllocation []string) ([]string, error) {
- sess, _ := session.NewSession()
+	var allocationIDs []string
+	var err error
+        sess, _ := session.NewSession()
 	ec2svc := ec2.New(sess)
 	for _, nameOrIDs := range eipAllocation {
 		if strings.HasPrefix(nameOrIDs, "eipalloc-") {
