@@ -222,7 +222,7 @@ func (t *defaultModelBuildTask) buildLoadBalancerSubnetMappings(_ context.Contex
 				return nil, err
 			}
 			if results.Addresses == nil {
-				return nil, errors.Errorf("EIP",nameOrIDs ,"is not found")
+				return nil, errors.Errorf("No EIP by the name (%d) is found",nameOrIDs)
 			} else {
 				singleallocationID := *results.Addresses[0].AllocationId
 				allocationIDs = append(allocationIDs, singleallocationID)
