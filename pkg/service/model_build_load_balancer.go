@@ -192,7 +192,7 @@ func (t *defaultModelBuildTask) buildLoadBalancerTags(ctx context.Context) (map[
 
 func (t *defaultModelBuildTask) buildLoadBalancerSubnetMappings(_ context.Context, ipAddressType elbv2model.IPAddressType, scheme elbv2model.LoadBalancerScheme, ec2Subnets []*ec2.Subnet) ([]elbv2model.SubnetMapping, error) {
 	var eipAllocation []string
-	var err error
+	//var err error
 	eipConfigured := t.annotationParser.ParseStringSliceAnnotation(annotations.SvcLBSuffixEIPAllocations, &eipAllocation, t.service.Annotations)
 	if eipConfigured {
 		if scheme != elbv2model.LoadBalancerSchemeInternetFacing {
@@ -262,7 +262,7 @@ func (t *defaultModelBuildTask) buildLoadBalancerSubnetMappings(_ context.Contex
 					allocationIDs = append(allocationIDs, nameOrIDs)
 			} else {
 				//r.ec2Client.DescribeSubnetsAsList(ctx, req)
-			results, err := t.ec2Client.DescribeAddresses(&ec2.DescribeAddressesInput{
+			results, err := t.ec2Client.DescribeAddresses(&t.ec2Client.DescribeAddressesInput{
 				Filters: []*ec2.Filter{
 					{
 						Name:   aws.String("tag:Name"),
@@ -272,7 +272,7 @@ func (t *defaultModelBuildTask) buildLoadBalancerSubnetMappings(_ context.Contex
 			})
 			if len(results.Addresses) == 0 {
 					
-				        return nil, err
+				        return nil, errors.Errorf("Cannot find a EIP by the name")
 			} else {
 					singleallocationID := *results.Addresses[0].AllocationId
 					allocationIDs = append(allocationIDs, singleallocationID)
