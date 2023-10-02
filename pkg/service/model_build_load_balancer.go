@@ -193,6 +193,7 @@ func (t *defaultModelBuildTask) buildLoadBalancerTags(ctx context.Context) (map[
 func (t *defaultModelBuildTask) buildLoadBalancerSubnetMappings(_ context.Context, ipAddressType elbv2model.IPAddressType, scheme elbv2model.LoadBalancerScheme, ec2Subnets []*ec2.Subnet) ([]elbv2model.SubnetMapping, error) {
 	var eipAllocation []string
 	//var err error
+	var returnedallocationIDs []string
 	var allocationIDs []string
 	
 	eipConfigured := t.annotationParser.ParseStringSliceAnnotation(annotations.SvcLBSuffixEIPAllocations, &eipAllocation, t.service.Annotations)
@@ -206,9 +207,11 @@ func (t *defaultModelBuildTask) buildLoadBalancerSubnetMappings(_ context.Contex
 		}
 		// beginning 
 
-	        allocationIDs, err := t.ec2Client.DescribeEIPs(eipAllocation)
+	        returnedallocationIDs, err := t.ec2Client.DescribeEIPs(eipAllocation)
 		if err != nil {
 			return nil, err
+		} else {
+			 allocationIDs = returnedallocationIDs
 		}
 		//fmt.Println(chosenSubnets,err)
 		//  end of my code. 
