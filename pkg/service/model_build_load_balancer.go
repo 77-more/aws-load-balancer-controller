@@ -262,7 +262,7 @@ func (t *defaultModelBuildTask) buildLoadBalancerSubnetMappings(_ context.Contex
 					allocationIDs = append(allocationIDs, nameOrIDs)
 			} else {
 				//r.ec2Client.DescribeSubnetsAsList(ctx, req)
-			results, err := t.ec2Client.DescribeAddresses(&t.ec2Client.DescribeAddressesInput{
+			results, _ := t.ec2Client.DescribeAddresses(&t.ec2Client.DescribeAddressesInput{
 				Filters: []*ec2.Filter{
 					{
 						Name:   aws.String("tag:Name"),
