@@ -14,7 +14,7 @@ import (
 	"regexp"
 	"sort"
 	"strconv"
-	"strings"
+	//"strings"
 
 	"sigs.k8s.io/aws-load-balancer-controller/pkg/algorithm"
 	elbv2deploy "sigs.k8s.io/aws-load-balancer-controller/pkg/deploy/elbv2"
@@ -205,7 +205,7 @@ func (t *defaultModelBuildTask) buildLoadBalancerSubnetMappings(_ context.Contex
 		}
 		// beginning 
 
-	        allocationIDs, err = r.ec2Client.DescribeEIPs(eipAllocation)
+	        allocationIDs, err = t.ec2Client.DescribeEIPs(eipAllocation)
 		fmt.Println(chosenSubnets,err)
 		//  end of my code. 
 	}
