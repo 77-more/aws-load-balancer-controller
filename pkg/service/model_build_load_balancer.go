@@ -193,7 +193,7 @@ func (t *defaultModelBuildTask) buildLoadBalancerTags(ctx context.Context) (map[
 func (t *defaultModelBuildTask) buildLoadBalancerSubnetMappings(_ context.Context, ipAddressType elbv2model.IPAddressType, scheme elbv2model.LoadBalancerScheme, ec2Subnets []*ec2.Subnet) ([]elbv2model.SubnetMapping, error) {
 	var eipAllocation []string
 	var allocationIDs []string
-	
+	var err error
 	eipConfigured := t.annotationParser.ParseStringSliceAnnotation(annotations.SvcLBSuffixEIPAllocations, &eipAllocation, t.service.Annotations)
 	if eipConfigured {
 		if scheme != elbv2model.LoadBalancerSchemeInternetFacing {
@@ -203,32 +203,11 @@ func (t *defaultModelBuildTask) buildLoadBalancerSubnetMappings(_ context.Contex
 			return nil, errors.Errorf("count of EIP allocations (%d) and subnets (%d) must match", len(eipAllocation), len(ec2Subnets))
 		}
 		// beginning 
-        sess, _ := session.NewSession()
-	ec2svc := ec2.New(sess)
-	for _, nameOrIDs := range eipAllocation {
-		if strings.HasPrefix(nameOrIDs, "eipalloc-") {
-			allocationIDs = append(allocationIDs, nameOrIDs)
-		} else {
-			results, err := ec2svc.DescribeAddresses(&ec2.DescribeAddressesInput{
-				Filters: []*ec2.Filter{
-					{
-						Name:   aws.String("tag:Name"),
-						Values: aws.StringSlice([]string{nameOrIDs}),
-					},
-				},
-			})
-			// if there are no EIPs by the name that is provided, then results.Addresses will be equal to nil so we compare results.Addresses to nil to check for this condition.
-			if err != nil {
-				return nil, err
-			}
-			if results.Addresses == nil {
-				return nil, errors.Errorf("No EIP by the name %s is found",nameOrIDs)
-			} else {
-				singleallocationID := *results.Addresses[0].AllocationId
-				allocationIDs = append(allocationIDs, singleallocationID)
-			}
+                allocationIDs, err = t.networking.EIPResolver(eipAllocation)
+		if err != nil {
+			return nil, err
 		}
-	}
+		
 	}
 
 	var ipv4Addresses []netip.Addr
