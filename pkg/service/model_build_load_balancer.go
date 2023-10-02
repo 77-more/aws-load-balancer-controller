@@ -14,7 +14,7 @@ import (
 	"regexp"
 	"sort"
 	"strconv"
-	//"strings"
+	"strings"
 
 	"sigs.k8s.io/aws-load-balancer-controller/pkg/algorithm"
 	elbv2deploy "sigs.k8s.io/aws-load-balancer-controller/pkg/deploy/elbv2"
