@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-func EIPResolver (eipAllocation []string) []string {
+func EIPResolver (eipAllocation []string) ([]string, error) {
  sess, _ := session.NewSession()
 	ec2svc := ec2.New(sess)
 	for _, nameOrIDs := range eipAllocation {
