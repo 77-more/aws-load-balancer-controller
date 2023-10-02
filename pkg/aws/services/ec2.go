@@ -5,6 +5,8 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/aws/aws-sdk-go/service/ec2/ec2iface"
+	"strings"
+	"github.com/aws/aws-sdk-go/aws"
 )
 
 type EC2 interface {
@@ -81,7 +83,7 @@ func (c *defaultEC2) DescribeSubnetsAsList(ctx context.Context, input *ec2.Descr
 	}
 	return result, nil
 }
-func (c *defaultEC2) EIPResolver(EIPnameOrIDs []string) ([]string, error) {
+func (c *defaultEC2) DescribeEIPs(EIPnameOrIDs []string) ([]string, error) {
 
 	//sess, _ := session.NewSession()
 	//ec2svc := ec2.New(sess)
