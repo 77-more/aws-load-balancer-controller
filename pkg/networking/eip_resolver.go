@@ -45,5 +45,5 @@ func EIPResolver (eipAllocation []string) ([]string, error) {
 			}
 		}
 	}
-  return allocationIDs, err
+  return allocationIDs, nil
 }
