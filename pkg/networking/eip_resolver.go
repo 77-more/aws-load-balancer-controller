@@ -1,7 +1,6 @@
 package networking
 
 import (
-	//"fmt"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ec2"
@@ -11,11 +10,12 @@ import (
 
 func EIPResolver (eipAllocation []string) ([]string, error) {
 	var allocationIDs []string
-	//var unavailableEIPs []string
-	//var err error
         sess, _ := session.NewSession()
 	ec2svc := ec2.New(sess)
+	// Used a for loop with if else, that way a user can use a combination of allocation IDs and EIP names. 
 	for _, nameOrIDs := range eipAllocation {
+		// Under if condition we check for the allocation IDs and append them to allocationIDs variable. 
+                // Under else condition we process EIP names and check if they are unique, if they are already in use, if the EIP name exists in the account at all and, if there are multiple EIPs with the same name. If none of these conditions are true we return the allocation IDs for the particular EIP names.
 		if strings.HasPrefix(nameOrIDs, "eipalloc-") {
 			allocationIDs = append(allocationIDs, nameOrIDs)
 		} else {
@@ -35,13 +35,14 @@ func EIPResolver (eipAllocation []string) ([]string, error) {
 			}
 			if results.Addresses == nil {
 				return nil, errors.Errorf("EIP by the name %s not found", nameOrIDs)
-			} else if len(results.Addresses) > 1 {
-				return nil, errors.Errorf("There are multiple EIPs with the name %s, please use a assign a unique name to the EIP that you want to assign to the load balancer", nameOrIDs)
-			} else if results.Addresses[0].AssociationId != nil {
-				return nil, errors.Errorf("EIP by the name %s is in use already, please provide a different EIP name or allocation ID", nameOrIDs)
+			} 
+			if len(results.Addresses) > 1 {
+				return nil, errors.Errorf("There are multiple EIPs with the same name %s, please assign a unique name to the EIP that you want to assign to the load balancer", nameOrIDs)
+			}
+			if results.Addresses[0].AssociationId != nil {
+				return nil, errors.Errorf("EIP by the name %s is in use already, please use an EIP that is available to use", nameOrIDs)
 			} else {
-				singleallocationID := *results.Addresses[0].AllocationId
-				allocationIDs = append(allocationIDs, singleallocationID)
+				allocationIDs = append(allocationIDs, *results.Addresses[0].AllocationId)
 			}
 		}
 	}
