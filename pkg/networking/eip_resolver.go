@@ -11,7 +11,8 @@ import (
 
 func EIPResolver (eipAllocation []string) ([]string, error) {
 	var allocationIDs []string
-	var err error
+	//var unavailableEIPs []string
+	//var err error
         sess, _ := session.NewSession()
 	ec2svc := ec2.New(sess)
 	for _, nameOrIDs := range eipAllocation {
