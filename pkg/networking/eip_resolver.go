@@ -9,6 +9,7 @@ import (
 )
 
 func EIPResolver (eipAllocation []string) ([]string, error) {
+	return nil, errors.Errorf("TEST LINE")
 	var allocationIDs []string
         sess, _ := session.NewSession()
 	ec2svc := ec2.New(sess)
