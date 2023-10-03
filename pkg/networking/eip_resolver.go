@@ -31,7 +31,7 @@ func EIPResolver (eipAllocation []string) ([]string, error) {
 			// with the below line I see that the error message is being printed on all load balancer describe messages and not just under the one that needs to have this error. 
 			// Also I see "Failed deploy model due to ResourceInUse: The allocation IDs are not available for use" error message before the custom message I put in below. 
 			// "Observed a panic in reconciler: runtime error: invalid memory address or nil pointer dereference"
-                        if *results.Addresses[0].AssociationId != "" {
+                        if results.Addresses[0].AssociationId != nil {
 				return nil, errors.Errorf("EIP by the name %s is in use already, please provide a different EIP name or allocation ID", nameOrIDs)
 			}
 			if err != nil {
