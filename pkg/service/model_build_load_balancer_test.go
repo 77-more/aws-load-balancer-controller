@@ -323,6 +323,60 @@ func Test_defaultModelBuilderTask_buildSubnetMappings(t *testing.T) {
 			wantErr: errors.New("count of EIP allocations (1) and subnets (2) must match"),
 		},
 		{
+			name:          "ipv4 - with EIP names: EIPs don't exist",
+			ipAddressType: elbv2.IPAddressTypeIPV4,
+			scheme:        elbv2.LoadBalancerSchemeInternetFacing,
+			subnets: []*ec2.Subnet{
+				{
+					SubnetId:         aws.String("subnet-1"),
+					AvailabilityZone: aws.String("us-west-2a"),
+					VpcId:            aws.String("vpc-1"),
+					CidrBlock:        aws.String("192.168.1.0/24"),
+				},
+				{
+					SubnetId:         aws.String("subnet-2"),
+					AvailabilityZone: aws.String("us-west-2b"),
+					VpcId:            aws.String("vpc-1"),
+					CidrBlock:        aws.String("192.168.2.0/24"),
+				},
+			},
+			svc: &corev1.Service{
+				ObjectMeta: metav1.ObjectMeta{
+					Annotations: map[string]string{
+						"service.beta.kubernetes.io/aws-load-balancer-eip-allocations": "nonexistentEIP1, nonexistentEIP2",
+					},
+				},
+			},
+			wantErr: errors.New("No EIP by the name nonexistentEIP1 exists"),
+		},
+                {
+		        name:          "ipv4 - with EIP names: multiple EIPs with the same name found",
+			ipAddressType: elbv2.IPAddressTypeIPV4,
+			scheme:        elbv2.LoadBalancerSchemeInternetFacing,
+			subnets: []*ec2.Subnet{
+				{
+					SubnetId:         aws.String("subnet-1"),
+					AvailabilityZone: aws.String("us-west-2a"),
+					VpcId:            aws.String("vpc-1"),
+					CidrBlock:        aws.String("192.168.1.0/24"),
+				},
+				{
+					SubnetId:         aws.String("subnet-2"),
+					AvailabilityZone: aws.String("us-west-2b"),
+					VpcId:            aws.String("vpc-1"),
+					CidrBlock:        aws.String("192.168.2.0/24"),
+				},
+			},
+			svc: &corev1.Service{
+				ObjectMeta: metav1.ObjectMeta{
+					Annotations: map[string]string{
+						"service.beta.kubernetes.io/aws-load-balancer-eip-allocations": "eip1, eip2",
+					},
+				},
+			},
+			wantErr: errors.New("No EIP by the name nonexistentEIP1 exists"),
+		},
+		{
 			name:          "ipv4 - with PrivateIPv4Address",
 			ipAddressType: elbv2.IPAddressTypeIPV4,
 			scheme:        elbv2.LoadBalancerSchemeInternal,
