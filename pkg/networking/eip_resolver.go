@@ -9,13 +9,13 @@ import (
 	
 )
 
-func EIPResolver (eipAllocation []string) ([]string, error) {
+func EIPResolver (eipAllocationNameOrID []string) ([]string, error) {
 	
 	var allocationIDs []string
         sess, _ := session.NewSession()
 	ec2svc := ec2.New(sess)
 	// Used a for loop with if else, that way a user can use a combination of allocation IDs and EIP names. 
-	for _, nameOrIDs := range eipAllocation {
+	for _, nameOrIDs := range eipAllocationNameOrID {
 		// Under if condition we check for the allocation IDs and append them to allocationIDs variable. 
                 // Under else condition we process EIP names and check if they are unique, if they are already in use, if the EIP name exists in the account at all and, if there are multiple EIPs with the same name. If none of these conditions are true we return the allocation IDs for the particular EIP names.
 		if strings.HasPrefix(nameOrIDs, "eipalloc-") {
