@@ -1,7 +1,7 @@
 package networking
 
 import (
-	/*"strings"
+	"strings"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ec2"*/
@@ -10,8 +10,8 @@ import (
 )
 
 func EIPResolver (eipAllocation []string) ([]string, error) {
-	return nil, errors.Errorf("TEST LINE")
-	/*var allocationIDs []string
+	
+	var allocationIDs []string
         sess, _ := session.NewSession()
 	ec2svc := ec2.New(sess)
 	// Used a for loop with if else, that way a user can use a combination of allocation IDs and EIP names. 
@@ -48,5 +48,5 @@ func EIPResolver (eipAllocation []string) ([]string, error) {
 			}
 		}
 	}
-  return allocationIDs, nil */
+  return allocationIDs, nil
 }
