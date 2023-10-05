@@ -7,9 +7,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-type MockEC2API struct{}
-
-func (m *MockEC2API) DescribeAddresses(input *ec2.DescribeAddressesInput) (*ec2.DescribeAddressesOutput, error) {
+func DescribeAddresses(input *ec2.DescribeAddressesInput) (*ec2.DescribeAddressesOutput, error) {
 	// Simulate the behavior of DescribeAddresses based on the test case
 	if len(input.Filters) == 1 && *input.Filters[0].Values[0] == "existing-eip" {
 		return &ec2.DescribeAddressesOutput{
@@ -25,7 +23,6 @@ func (m *MockEC2API) DescribeAddresses(input *ec2.DescribeAddressesInput) (*ec2.
 }
 
 func TestEIPResolver(t *testing.T) {
-	mockEC2 := &MockEC2API{}
 	tests := []struct {
 		name           string
 		input          []string
