@@ -11,7 +11,7 @@ import (
 func initAWSSession() *session.Session {
     // Initialize an AWS session with a specific region
     awsSession, err := session.NewSession(&aws.Config{
-        Region: aws.String("us-east-1"), // Replace with your desired AWS region
+        Region: aws.String("us-east-1"), 
     })
 
     if err != nil {
@@ -24,9 +24,6 @@ func initAWSSession() *session.Session {
 func DescribeAddresses(input *ec2.DescribeAddressesInput) (*ec2.DescribeAddressesOutput, error) {
     // Initialize an AWS session
     awsSession := initAWSSession()
-
-    // Create an EC2 service client with the session
-    ec2svc := ec2.New(awsSession)
 
     // Simulate the behavior of DescribeAddresses based on the test case
     if len(input.Filters) == 1 && *input.Filters[0].Values[0] == "existing-eip" {
@@ -41,6 +38,8 @@ func DescribeAddresses(input *ec2.DescribeAddressesInput) (*ec2.DescribeAddresse
     }
     return nil, errors.New("EIP not found")
 }
+
+
 
 
 func TestEIPResolver(t *testing.T) {
