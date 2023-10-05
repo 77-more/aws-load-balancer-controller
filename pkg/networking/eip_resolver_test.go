@@ -1,26 +1,47 @@
 package networking
 
 import (
-	"testing"
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/service/ec2"
-	"github.com/pkg/errors"
+    "testing"
+    "github.com/aws/aws-sdk-go/aws"
+    "github.com/aws/aws-sdk-go/aws/session"
+    "github.com/aws/aws-sdk-go/service/ec2"
+    "github.com/pkg/errors"
 )
 
-func DescribeAddresses(input *ec2.DescribeAddressesInput) (*ec2.DescribeAddressesOutput, error) {
-	// Simulate the behavior of DescribeAddresses based on the test case
-	if len(input.Filters) == 1 && *input.Filters[0].Values[0] == "existing-eip" {
-		return &ec2.DescribeAddressesOutput{
-			Addresses: []*ec2.Address{
-				{
-					AllocationId: aws.String("allocation-id"),
-					AssociationId: aws.String("association-id"),
-				},
-			},
-		}, nil
-	}
-	return nil, errors.New("EIP not found")
+func initAWSSession() *session.Session {
+    // Initialize an AWS session with a specific region
+    awsSession, err := session.NewSession(&aws.Config{
+        Region: aws.String("us-east-1"), // Replace with your desired AWS region
+    })
+
+    if err != nil {
+        panic("Failed to create AWS session: " + err.Error())
+    }
+
+    return awsSession
 }
+
+func DescribeAddresses(input *ec2.DescribeAddressesInput) (*ec2.DescribeAddressesOutput, error) {
+    // Initialize an AWS session
+    awsSession := initAWSSession()
+
+    // Create an EC2 service client with the session
+    ec2svc := ec2.New(awsSession)
+
+    // Simulate the behavior of DescribeAddresses based on the test case
+    if len(input.Filters) == 1 && *input.Filters[0].Values[0] == "existing-eip" {
+        return &ec2.DescribeAddressesOutput{
+            Addresses: []*ec2.Address{
+                {
+                    AllocationId: aws.String("allocation-id"),
+                    AssociationId: aws.String("association-id"),
+                },
+            },
+        }, nil
+    }
+    return nil, errors.New("EIP not found")
+}
+
 
 func TestEIPResolver(t *testing.T) {
 	tests := []struct {
