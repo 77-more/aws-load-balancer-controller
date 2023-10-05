@@ -7,7 +7,6 @@ import (
 	"github.com/pkg/errors"
 )
 
-// MockEC2API is a mock implementation of the EC2 API
 type MockEC2API struct{}
 
 func (m *MockEC2API) DescribeAddresses(input *ec2.DescribeAddressesInput) (*ec2.DescribeAddressesOutput, error) {
@@ -26,13 +25,8 @@ func (m *MockEC2API) DescribeAddresses(input *ec2.DescribeAddressesInput) (*ec2.
 }
 
 func TestEIPResolver(t *testing.T) {
-	// Create a new instance of the mock EC2 API
 	mockEC2 := &MockEC2API{}
-
-	// Initialize your EIPResolver function with the mockEC2 instance
 	resolver := EIPResolver{}
-
-	// Define test cases
 	tests := []struct {
 		name           string
 		input          []string
@@ -61,10 +55,8 @@ func TestEIPResolver(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			// Call your function under test
 			resultIDs, err := resolver.EIPResolver(tc.input)
 
-			// Check the expected result
 			if err != nil && tc.expectedError == nil {
 				t.Errorf("Expected no error, but got error: %v", err)
 			}
@@ -78,7 +70,6 @@ func TestEIPResolver(t *testing.T) {
 	}
 }
 
-// Helper function to compare string slices
 func stringSliceEqual(slice1, slice2 []string) bool {
 	if len(slice1) != len(slice2) {
 		return false
