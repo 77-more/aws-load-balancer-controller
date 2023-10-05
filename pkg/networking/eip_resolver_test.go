@@ -26,7 +26,6 @@ func (m *MockEC2API) DescribeAddresses(input *ec2.DescribeAddressesInput) (*ec2.
 
 func TestEIPResolver(t *testing.T) {
 	mockEC2 := &MockEC2API{}
-	resolver := EIPResolver{}
 	tests := []struct {
 		name           string
 		input          []string
@@ -55,7 +54,7 @@ func TestEIPResolver(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			resultIDs, err := resolver.EIPResolver(tc.input)
+			resultIDs, err := networking.EIPResolver(tc.input)
 
 			if err != nil && tc.expectedError == nil {
 				t.Errorf("Expected no error, but got error: %v", err)
