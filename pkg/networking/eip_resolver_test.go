@@ -54,7 +54,7 @@ func TestEIPResolver(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			resultIDs, err := networking.EIPResolver(tc.input)
+			resultIDs, err := EIPResolver(tc.input)
 
 			if err != nil && tc.expectedError == nil {
 				t.Errorf("Expected no error, but got error: %v", err)
