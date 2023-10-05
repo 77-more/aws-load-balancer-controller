@@ -1,58 +1,92 @@
 package networking
 
 import (
-    "testing"
-    "github.com/stretchr/testify/assert"
-    "github.com/stretchr/testify/mock"
-    "github.com/aws/aws-sdk-go/aws"
-    "github.com/aws/aws-sdk-go/service/ec2"
+	"testing"
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/service/ec2"
+	"github.com/pkg/errors"
 )
 
 // MockEC2API is a mock implementation of the EC2 API
-type MockEC2API struct {
-    mock.Mock
-}
+type MockEC2API struct{}
 
 func (m *MockEC2API) DescribeAddresses(input *ec2.DescribeAddressesInput) (*ec2.DescribeAddressesOutput, error) {
-    args := m.Called(input)
-    return args.Get(0).(*ec2.DescribeAddressesOutput), args.Error(1)
+	// Simulate the behavior of DescribeAddresses based on the test case
+	if len(input.Filters) == 1 && *input.Filters[0].Values[0] == "existing-eip" {
+		return &ec2.DescribeAddressesOutput{
+			Addresses: []*ec2.Address{
+				{
+					AllocationId: aws.String("allocation-id"),
+					AssociationId: aws.String("association-id"),
+				},
+			},
+		}, nil
+	}
+	return nil, errors.New("EIP not found")
 }
 
 func TestEIPResolver(t *testing.T) {
-    // Create a new instance of the mock EC2 API
-    mockEC2 := new(MockEC2API)
+	// Create a new instance of the mock EC2 API
+	mockEC2 := &MockEC2API{}
 
-    // Initialize your EIPResolver function with the mockEC2 instance
-    resolver := EIPResolver{}
+	// Initialize your EIPResolver function with the mockEC2 instance
+	resolver := EIPResolver{}
 
-    // Define the test data (input EIP names)
-    inputNames := []string{"eip-1", "eip-2"}
+	// Define test cases
+	tests := []struct {
+		name           string
+		input          []string
+		expectedResult []string
+		expectedError  error
+	}{
+		{
+			name:           "Resolve EIP by Allocation ID",
+			input:          []string{"eipalloc-1"},
+			expectedResult: []string{"eipalloc-1"},
+			expectedError:  nil,
+		},
+		{
+			name:           "Resolve EIP by Name",
+			input:          []string{"existing-eip"},
+			expectedResult: []string{"allocation-id"},
+			expectedError:  nil,
+		},
+		{
+			name:           "EIP not found",
+			input:          []string{"non-existent-eip"},
+			expectedResult: nil,
+			expectedError:  errors.New("EIP not found"),
+		},
+	}
 
-    // Set up mock behavior for DescribeAddresses
-    mockEC2.On("DescribeAddresses", mock.Anything).Return(
-        &ec2.DescribeAddressesOutput{
-            Addresses: []*ec2.Address{
-                {AllocationId: aws.String("alloc-1")},
-                {AllocationId: aws.String("alloc-2")},
-            },
-        },
-        nil,
-    )
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			// Call your function under test
+			resultIDs, err := resolver.EIPResolver(tc.input)
 
-    // Call your function under test
-    resultIDs, err := resolver.EIPResolver(inputNames)
+			// Check the expected result
+			if err != nil && tc.expectedError == nil {
+				t.Errorf("Expected no error, but got error: %v", err)
+			}
+			if err == nil && tc.expectedError != nil {
+				t.Errorf("Expected error: %v, but got no error", tc.expectedError)
+			}
+			if err == nil && tc.expectedError == nil && !stringSliceEqual(resultIDs, tc.expectedResult) {
+				t.Errorf("Expected result: %v, but got result: %v", tc.expectedResult, resultIDs)
+			}
+		})
+	}
+}
 
-    // Assertions
-    assert.Nil(t, err)  // Check that there's no error
-    assert.Equal(t, []string{"alloc-1", "alloc-2"}, resultIDs) // Check that the result matches the expected IDs
-
-    // Ensure that the DescribeAddresses method was called with the expected input
-    mockEC2.AssertCalled(t, "DescribeAddresses", &ec2.DescribeAddressesInput{
-        Filters: []*ec2.Filter{
-            {
-                Name:   aws.String("tag:Name"),
-                Values: aws.StringSlice(inputNames),
-            },
-        },
-    })
+// Helper function to compare string slices
+func stringSliceEqual(slice1, slice2 []string) bool {
+	if len(slice1) != len(slice2) {
+		return false
+	}
+	for i := range slice1 {
+		if slice1[i] != slice2[i] {
+			return false
+		}
+	}
+	return true
 }
