@@ -1,25 +1,39 @@
-package networking
-
 import (
-	"strings"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/pkg/errors"
-	
+	"strings"
 )
 
-func EIPResolver (eipAllocationNameOrID []string) ([]string, error) {
-	
-	var allocationIDs []string
-        sess, _ := session.NewSession()
+var err error
+
+type resolver interface {
+	eipresolver() ([]string, error)
+}
+
+type EIPnameOrIDs struct {
+	inputEIPnameOrIDs []string
+}
+
+func (e EIPnameOrIDs) EIPResolver() ([]string, error) {
+
+	sess, _ := session.NewSession()
 	ec2svc := ec2.New(sess)
-	// Used a for loop with if else, that way a user can use a combination of allocation IDs and EIP names. 
-	for _, nameOrIDs := range eipAllocationNameOrID {
-		// Under if condition we check for the allocation IDs and append them to allocationIDs variable. 
-                // Under else condition we process EIP names and check if they are unique, if they are already in use, if the EIP name exists in the account at all and, if there are multiple EIPs with the same name. If none of these conditions are true we return the allocation IDs for the particular EIP names.
+	inputEIPSlices := e.inputEIPnameOrIDs
+	var allocationIDs []string
+	for _, nameOrIDs := range inputEIPSlices {
 		if strings.HasPrefix(nameOrIDs, "eipalloc-") {
 			allocationIDs = append(allocationIDs, nameOrIDs)
+			first, err := ec2svc.DescribeAddresses(&ec2.DescribeAddressesInput{
+				Filters: []*ec2.Filter{
+					{
+						Name:   aws.String("allocation-id"),
+						Values: aws.StringSlice([]string{nameOrIDs}),
+					},
+				},
+			})
+			fmt.Println(first, err)
 		} else {
 			results, err := ec2svc.DescribeAddresses(&ec2.DescribeAddressesInput{
 				Filters: []*ec2.Filter{
@@ -29,24 +43,40 @@ func EIPResolver (eipAllocationNameOrID []string) ([]string, error) {
 					},
 				},
 			})
-			// I see below error message before the custom message I created below. How to supress it?
-                        // The allocation IDs are not available for use status code: 400, request id: e89d6089-dc18-42e6-8400-d620a7845ad4
-	
-                        if err != nil {
+			// if there are no EIPs by the name that is provided, then results.Addresses will be equal to nil so we compare results.Addresses to nil to check for this condition.
+			//if *results.Addresses[0].AssociationId != "" {
+			//	return nil, errors.Errorf("EIP by the name %s is in use already, please provide a different EIP name or allocation ID", nameOrIDs)
+			//}
+			if err != nil {
 				return nil, err
 			}
 			if results.Addresses == nil {
 				return nil, errors.Errorf("EIP by the name %s not found", nameOrIDs)
-			} 
-			if len(results.Addresses) > 1 {
-				return nil, errors.Errorf("There are multiple EIPs with the same name %s, please assign a unique name to the EIP that you want to assign to the load balancer", nameOrIDs)
-			}
-			if results.Addresses[0].AssociationId != nil {
-				return nil, errors.Errorf("EIP by the name %s is in use already, please use an EIP that is available to use", nameOrIDs)
+			} else if len(results.Addresses) > 1 {
+				return nil, errors.Errorf("There are multiple EIPs with the name %s, please use a assign a unique name to the EIP that you want to assign to the load balancer", nameOrIDs)
+			} else if results.Addresses[0].AssociationId != nil {
+				return nil, errors.Errorf("EIP by the name %s is in use already, please provide a different EIP name or allocation ID", nameOrIDs)
 			} else {
-				allocationIDs = append(allocationIDs, *results.Addresses[0].AllocationId)
+				singleallocationID := *results.Addresses[0].AllocationId
+				allocationIDs = append(allocationIDs, singleallocationID)
 			}
 		}
 	}
-  return allocationIDs, nil
+	return allocationIDs, nil
 }
+
+
+/*func main() {
+
+	var e resolver
+	e = EIPnameOrIDs{
+		inputEIPnameOrIDs: []string{"test243"},
+	}
+
+	var returningEIPs []string
+
+	//	EIPnameOrIDs := []string{"test1"}
+	returningEIPs, err = e.eipresolver()
+	fmt.Println("available EIPs:", returningEIPs)
+	fmt.Println(err)
+}*/
