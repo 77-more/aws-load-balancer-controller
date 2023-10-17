@@ -8,7 +8,7 @@ import (
 // testing
 var err error
 
-type resolver interface {
+type Resolver interface {
 	eipresolver() ([]string, error)
 }
 

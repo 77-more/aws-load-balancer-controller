@@ -27,6 +27,7 @@ import (
 	"sigs.k8s.io/aws-load-balancer-controller/pkg/deploy/tracking"
 	elbv2model "sigs.k8s.io/aws-load-balancer-controller/pkg/model/elbv2"
 	"sigs.k8s.io/aws-load-balancer-controller/pkg/networking"
+	r "sigs.k8s.io/aws-load-balancer-controller/pkg/networking"
 	//"github.com/aws/aws-sdk-go/aws/session"
 )
 
@@ -193,6 +194,7 @@ func (t *defaultModelBuildTask) buildLoadBalancerTags(ctx context.Context) (map[
 func (t *defaultModelBuildTask) buildLoadBalancerSubnetMappings(_ context.Context, ipAddressType elbv2model.IPAddressType, scheme elbv2model.LoadBalancerScheme, ec2Subnets []*ec2.Subnet) ([]elbv2model.SubnetMapping, error) {
 	var eipAllocation []string
 	var allocationIDs []string
+	var EIP r.Resolver
 	var err error
 	eipConfigured := t.annotationParser.ParseStringSliceAnnotation(annotations.SvcLBSuffixEIPAllocations, &eipAllocation, t.service.Annotations)
 	if eipConfigured {
@@ -203,7 +205,10 @@ func (t *defaultModelBuildTask) buildLoadBalancerSubnetMappings(_ context.Contex
 			return nil, errors.Errorf("count of EIP allocations (%d) and subnets (%d) must match", len(eipAllocation), len(ec2Subnets))
 		}
 		// beginning 
-                allocationIDs, err = networking.EIPResolver(eipAllocation)
+		        EIP = r.EIPnameOrIDs{
+					  inputEIPnameOrIDs: eipAllocation
+				}
+                allocationIDs, err = EIP.EIPResolver()
 		if err != nil {
 			return nil, err
 		}
