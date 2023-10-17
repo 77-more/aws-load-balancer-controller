@@ -12,7 +12,7 @@ import (
 var err error
 
 type Resolver interface {
-	eipresolver() ([]string, error)
+	EIPResolver() ([]string, error)
 }
 
 type EIPnameOrIDs struct {
