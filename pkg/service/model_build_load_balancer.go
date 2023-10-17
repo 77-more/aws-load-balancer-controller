@@ -26,7 +26,7 @@ import (
 	"sigs.k8s.io/aws-load-balancer-controller/pkg/config"
 	"sigs.k8s.io/aws-load-balancer-controller/pkg/deploy/tracking"
 	elbv2model "sigs.k8s.io/aws-load-balancer-controller/pkg/model/elbv2"
-	//"sigs.k8s.io/aws-load-balancer-controller/pkg/networking"
+	"sigs.k8s.io/aws-load-balancer-controller/pkg/networking"
 	r "sigs.k8s.io/aws-load-balancer-controller/pkg/networking"
 	//"github.com/aws/aws-sdk-go/aws/session"
 )
