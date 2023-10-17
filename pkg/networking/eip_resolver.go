@@ -36,7 +36,6 @@ func (e EIPnameOrIDs) EIPResolver() ([]string, error) {
 					},
 				},
 			})
-			fmt.Println(first, err)
 		} else {
 			results, err := ec2svc.DescribeAddresses(&ec2.DescribeAddressesInput{
 				Filters: []*ec2.Filter{
