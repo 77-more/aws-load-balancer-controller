@@ -16,14 +16,14 @@ type Resolver interface {
 }
 
 type EIPnameOrIDs struct {
-	inputEIPnameOrIDs []string
+	InputEIPnameOrIDs []string
 }
 
 func (e EIPnameOrIDs) EIPResolver() ([]string, error) {
 
 	sess, _ := session.NewSession()
 	ec2svc := ec2.New(sess)
-	inputEIPSlices := e.inputEIPnameOrIDs
+	inputEIPSlices := e.InputEIPnameOrIDs
 	var allocationIDs []string
 	for _, nameOrIDs := range inputEIPSlices {
 		if strings.HasPrefix(nameOrIDs, "eipalloc-") {
