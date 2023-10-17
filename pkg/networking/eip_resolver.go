@@ -28,14 +28,6 @@ func (e EIPnameOrIDs) EIPResolver() ([]string, error) {
 	for _, nameOrIDs := range inputEIPSlices {
 		if strings.HasPrefix(nameOrIDs, "eipalloc-") {
 			allocationIDs = append(allocationIDs, nameOrIDs)
-			first, err := ec2svc.DescribeAddresses(&ec2.DescribeAddressesInput{
-				Filters: []*ec2.Filter{
-					{
-						Name:   aws.String("allocation-id"),
-						Values: aws.StringSlice([]string{nameOrIDs}),
-					},
-				},
-			})
 		} else {
 			results, err := ec2svc.DescribeAddresses(&ec2.DescribeAddressesInput{
 				Filters: []*ec2.Filter{
