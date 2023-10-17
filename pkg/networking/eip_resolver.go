@@ -1,3 +1,6 @@
+package networking
+
+
 import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
