@@ -206,7 +206,7 @@ func (t *defaultModelBuildTask) buildLoadBalancerSubnetMappings(_ context.Contex
 		}
 		// beginning 
 		        EIP = r.EIPnameOrIDs{
-					  inputEIPnameOrIDs: eipAllocation,
+					  InputEIPnameOrIDs: eipAllocation,
 				}
                 allocationIDs, err = EIP.EIPResolver()
 		if err != nil {
